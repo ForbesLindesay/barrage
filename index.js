@@ -1,6 +1,5 @@
 'use strict'
 
-var concat = require('concat-stream')
 var Promise = require('promise')
 
 var old = !require('stream').Transform
@@ -13,11 +12,6 @@ function barrage(s, prototype) {
       var os = s
       s = new stream.Readable({objectMode: true})
       s.wrap(os)
-      if (typeof os.write === 'function') s.write = os.write.bind(os)
-      if (typeof os.end === 'function') s.end = os.end.bind(os)
-      os.on('drain', s.emit.bind(s, 'drain'))
-      os.on('close', s.emit.bind(s, 'close'))
-      os.on('pipe', s.emit.bind(s, 'pipe'))
     }
   }
   s.syphon = syphon
@@ -45,9 +39,9 @@ function load(clsName) {
 
 /* Extensions */
 
-function syphon(stream) {
+function syphon(stream, options) {
   this.on('error', stream.emit.bind(stream, 'error'))
-  return this.pipe(stream)
+  return this.pipe(stream, options)
 }
 
 function wait(callback) {
@@ -61,11 +55,31 @@ function wait(callback) {
   return p.nodeify(callback)
 }
 
-function buffer(callback) {
+function buffer(encoding, callback) {
+  if (typeof encoding === 'function') callback = encoding, encoding = undefined
+
   var self = this
   var p = new Promise(function (resolve, reject) {
-    self.on('error', reject)
-    self.pipe(concat(resolve))
+    var dest = new stream.Writable({decodeStrings: !!encoding})
+    var erred = false
+    var body = []
+    dest._write = function (chunk, encoding, callback) {
+      if (!erred) {
+        body.push(chunk)
+      }
+      callback()
+    }
+    dest.on('error', function (err) {
+      reject(err)
+      erred = true
+    })
+    dest.on('finish', function () {
+      if (erred) return
+      if (encoding === 'buffer') resolve(Buffer.concat(body))
+      else if (encoding) resolve(Buffer.concat(body).toString(encoding))
+      else resolve(body)
+    })
+    self.syphon(dest)
   })
   return p.nodeify(callback)
 }

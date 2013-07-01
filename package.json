@@ -4,7 +4,6 @@
   "description": "Extensions to streams (as a mixin)",
   "keywords": [],
   "dependencies": {
-    "concat-stream": "~1.0.0",
     "promise": "~3.1.0"
   },
   "devDependencies": {
