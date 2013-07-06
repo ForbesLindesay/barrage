@@ -50,6 +50,7 @@ function wait(callback) {
     self.on('error', reject)
     self.on('finish', resolve)
     self.on('end', resolve)
+    self.on('close', resolve)
     if (typeof self.resume === 'function') self.resume()
   })
   return p.nodeify(callback)
