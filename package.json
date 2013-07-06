@@ -4,7 +4,7 @@
   "description": "Extensions to streams (as a mixin)",
   "keywords": [],
   "dependencies": {
-    "promise": "~3.1.0"
+    "promise": "~3.2.0"
   },
   "devDependencies": {
     "mocha": "*"
