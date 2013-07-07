@@ -1,6 +1,6 @@
 {
   "name": "barrage",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Extensions to streams (as a mixin)",
   "keywords": [],
   "dependencies": {
