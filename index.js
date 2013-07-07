@@ -61,7 +61,7 @@ function buffer(encoding, callback) {
 
   var self = this
   var p = new Promise(function (resolve, reject) {
-    var dest = new stream.Writable({decodeStrings: !!encoding})
+    var dest = new stream.Writable({decodeStrings: !!encoding, objectMode: !encoding})
     var erred = false
     var body = []
     dest._write = function (chunk, encoding, callback) {
