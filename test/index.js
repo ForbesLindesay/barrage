@@ -1,42 +1,19 @@
 'use strict'
 
 var assert = require('assert')
-var s = require('stream').Transform ? require('stream') : require('readable-stream')
+var s = require('stream')
+var Promise = require('promise')
 var b = require('../')
 
-var old = !require('stream').Transform
-
 describe('barrage(stream) mixin', function () {
-  if (old) {
-    describe('in v0.8 and earlier', function () {
-      it('wraps the read side of the stream using `readable-stream`', function (done) {
-        var r = new (require('stream'))()
-        var wrapped = b(r)
-        assert(wrapped instanceof s.Readable)
-        r.emit('data', 'foo')
-        setTimeout(function () {
-          wrapped.buffer(function (err, data) {
-            if (err) return done(err)
-            assert.deepEqual(['foo', 'bar'], data)
-            done()
-          })
-        }, 20)
-        r.emit('data', 'bar')
-        r.emit('end')
-      })
-    })
-  } else {
-    describe('in v0.10 and later', function () {
-      it('returns `stream` as a mixin', function () {
-        var r = new s.Readable()
-        var w = new s.Writable()
-        var t = new s.Transform()
-        assert(b(r) === r)
-        assert(b(w) === w)
-        assert(b(t) === t)
-      })
-    })
-  }
+  it('returns `stream` with a mixin', function () {
+    var r = new s.Readable()
+    var w = new s.Writable()
+    var t = new s.Transform()
+    assert(b(r) === r)
+    assert(b(w) === w)
+    assert(b(t) === t)
+  })
 })
 
 function streamType(name, type) {
@@ -169,6 +146,208 @@ describe('barrage extensions', function () {
           })
         })
       })
+    })
+  })
+  describe('BarrageStream#map', function () {
+    it('maps each element onto a new element', function (done) {
+      var source = new b.Readable({objectMode: true})
+      source._read = function () {
+        this.push(1)
+        this.push(2)
+        this.push(3)
+        this.push(null)
+      }
+      var data = []
+      source.map(function (x) { return x * x })
+        .on('error', done)
+        .on('data', function (chunk) {
+          data.push(chunk)
+        })
+        .on('end', function () {
+          assert.deepEqual(data, [1, 4, 9])
+          done()
+        })
+    })
+    it('can be used asynchronously', function (done) {
+      var source = new b.Readable({objectMode: true})
+      source._read = function () {
+        this.push(1)
+        this.push(2)
+        this.push(3)
+        this.push(null)
+      }
+      var data = []
+      source.map(function (x, callback) { setImmediate(function () { callback(null, x * x) }) })
+        .on('error', done)
+        .on('data', function (chunk) {
+          data.push(chunk)
+        })
+        .on('end', function () {
+          assert.deepEqual(data, [1, 4, 9])
+          done()
+        })
+    })
+    it('can be used with a promise', function (done) {
+      var source = new b.Readable({objectMode: true})
+      source._read = function () {
+        this.push(1)
+        this.push(2)
+        this.push(3)
+        this.push(null)
+      }
+      var data = []
+      source.map(function (x) { return Promise.from(x * x) })
+        .on('error', done)
+        .on('data', function (chunk) {
+          data.push(chunk)
+        })
+        .on('end', function () {
+          assert.deepEqual(data, [1, 4, 9])
+          done()
+        })
+    })
+    it('can be used in parallel', function (done) {
+      var source = new b.Readable({objectMode: true})
+      source._read = function () {
+        this.push(1)
+        this.push(2)
+        this.push(3)
+        this.push(null)
+      }
+      var data = []
+      var running = 0
+      source.map(function (x, callback) {
+        running++
+        if (x === 1) {
+          setTimeout(function () {
+            running--
+            callback(null, x * x)
+          }, 100)
+        }
+        if (x === 2) {
+          assert(running === 2)
+          setTimeout(function () {
+            running--
+            callback(null, x * x)
+          }, 50)
+        }
+        if (x === 3) {
+          assert(running <= 2)
+          setTimeout(function () {
+            running--
+            callback(null, x * x)
+          }, 0)
+        }
+      }, {parallel: 2})
+        .on('error', done)
+        .on('data', function (chunk) {
+          data.push(chunk)
+        })
+        .on('end', function () {
+          assert.deepEqual(data, [1, 4, 9])
+          done()
+        })
+    })
+  })
+  describe('BarrageStream#filter', function () {
+    it('filters each element', function (done) {
+      var source = new b.Readable({objectMode: true})
+      source._read = function () {
+        this.push(1)
+        this.push(2)
+        this.push(3)
+        this.push(null)
+      }
+      var data = []
+      source.filter(function (x) { return x > 1 })
+        .on('error', done)
+        .on('data', function (chunk) {
+          data.push(chunk)
+        })
+        .on('end', function () {
+          assert.deepEqual(data, [2, 3])
+          done()
+        })
+    })
+    it('can be used asynchronously', function (done) {
+      var source = new b.Readable({objectMode: true})
+      source._read = function () {
+        this.push(1)
+        this.push(2)
+        this.push(3)
+        this.push(null)
+      }
+      var data = []
+      source.filter(function (x, callback) { setImmediate(function () { callback(null, x > 1) }) })
+        .on('error', done)
+        .on('data', function (chunk) {
+          data.push(chunk)
+        })
+        .on('end', function () {
+          assert.deepEqual(data, [2, 3])
+          done()
+        })
+    })
+    it('can be used with a promise', function (done) {
+      var source = new b.Readable({objectMode: true})
+      source._read = function () {
+        this.push(1)
+        this.push(2)
+        this.push(3)
+        this.push(null)
+      }
+      var data = []
+      source.filter(function (x) { return Promise.from(x > 1) })
+        .on('error', done)
+        .on('data', function (chunk) {
+          data.push(chunk)
+        })
+        .on('end', function () {
+          assert.deepEqual(data, [2, 3])
+          done()
+        })
+    })
+    it('can be used in parallel', function (done) {
+      var source = new b.Readable({objectMode: true})
+      source._read = function () {
+        this.push(1)
+        this.push(2)
+        this.push(3)
+        this.push(null)
+      }
+      var data = []
+      var running = 0
+      source.filter(function (x, callback) {
+        running++
+        if (x === 1) {
+          setTimeout(function () {
+            running--
+            callback(null, false)
+          }, 100)
+        }
+        if (x === 2) {
+          assert(running === 2)
+          setTimeout(function () {
+            running--
+            callback(null, true)
+          }, 50)
+        }
+        if (x === 3) {
+          assert(running <= 2)
+          setTimeout(function () {
+            running--
+            callback(null, true)
+          }, 0)
+        }
+      }, {parallel: 2})
+        .on('error', done)
+        .on('data', function (chunk) {
+          data.push(chunk)
+        })
+        .on('end', function () {
+          assert.deepEqual(data, [2, 3])
+          done()
+        })
     })
   })
 })
