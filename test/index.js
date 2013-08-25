@@ -350,4 +350,46 @@ describe('barrage extensions', function () {
         })
     })
   })
+  describe('BarrageStream#bufferTransform', function () {
+    it('transforms as a buffer', function (done) {
+      var source = new b.Readable({objectMode: true})
+      source._read = function () {
+        this.push(1)
+        this.push(2)
+        this.push(3)
+        this.push(null)
+      }
+      var data = []
+      source.bufferTransform(function (x) { return x.reverse() })
+        .on('error', done)
+        .on('data', function (chunk) {
+          data.push(chunk)
+        })
+        .on('end', function () {
+          assert.deepEqual(data, [[3, 2, 1]])
+          done()
+        })
+    })
+    it('supports an encoding option', function (done) {
+      var source = new b.Readable({objectMode: true})
+      source._read = function () {
+        this.push('h')
+        this.push('e')
+        this.push('l')
+        this.push('l')
+        this.push('o')
+        this.push(null)
+      }
+      var data = []
+      source.bufferTransform(function (x) { return x + ' world' }, 'utf8')
+        .on('error', done)
+        .on('data', function (chunk) {
+          data.push(chunk.toString('utf8'))
+        })
+        .on('end', function () {
+          assert.deepEqual(data, ['hello world'])
+          done()
+        })
+    })
+  })
 })
