@@ -2,9 +2,9 @@
 
 Extensions to streams (as a mixin)
 
-[![Build Status](https://travis-ci.org/ForbesLindesay/barrage.png?branch=master)](https://travis-ci.org/ForbesLindesay/barrage)
-[![Dependency Status](https://gemnasium.com/ForbesLindesay/barrage.png)](https://gemnasium.com/ForbesLindesay/barrage)
-[![NPM version](https://badge.fury.io/js/barrage.png)](http://badge.fury.io/js/barrage)
+[![Build Status](https://img.shields.io/travis/ForbesLindesay/barrage/master.svg)](https://travis-ci.org/ForbesLindesay/barrage)
+[![Dependency Status](https://img.shields.io/gemnasium/ForbesLindesay/barrage.svg)](https://gemnasium.com/ForbesLindesay/barrage)
+[![NPM version](https://img.shields.io/npm/v/barrage.svg)](http://badge.fury.io/js/barrage)
 
 ## Installation
 
