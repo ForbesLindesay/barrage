@@ -54,6 +54,9 @@ function requires10() {
 function load(clsName) {
   var cls = stream[clsName]
   function Barrage() {
+    if (!(this instanceof Barrage)) {
+      throw new Error('Missing "new" on stream constructor');
+    }
     return cls.apply(this, arguments)
   }
   Barrage.prototype = Object.create(cls.prototype)
