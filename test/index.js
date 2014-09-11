@@ -196,7 +196,7 @@ describe('barrage extensions', function () {
         this.push(null)
       }
       var data = []
-      source.map(function (x) { return Promise.from(x * x) })
+      source.map(function (x) { return Promise.resolve(x * x) })
         .on('error', done)
         .on('data', function (chunk) {
           data.push(chunk)
@@ -297,7 +297,7 @@ describe('barrage extensions', function () {
         this.push(null)
       }
       var data = []
-      source.filter(function (x) { return Promise.from(x > 1) })
+      source.filter(function (x) { return Promise.resolve(x > 1) })
         .on('error', done)
         .on('data', function (chunk) {
           data.push(chunk)

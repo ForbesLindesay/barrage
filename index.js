@@ -162,7 +162,7 @@ function FlatMap(transform, options) {
   this._flatMap = promiseify(transform)
   this._flatMapParallel = options.parallel || 1
 
-  this._flatMapQueue = Promise.from(null)
+  this._flatMapQueue = Promise.resolve(null)
   this._flatMapQueueLength = 0
   this._flatMapCallbacks = []
 
