@@ -76,6 +76,32 @@ function load() {
 
 This is exactly like `barrage.map` / `new barrage.Map` except that `transform` should return `true` or `false` and the chunks will be filtered based on that value.
 
+### barrage.flatMap(transform, options) / new barrage.FlatMap(transform, options)
+
+Take a function that maps an object onto an array or stream (or if `for...of` is supported by your version of node, any iterable), then return a stream for those individual items.  e.g.
+
+```js
+var source = new b.Readable({objectMode: true});
+source._read = function () {
+  this.push(1)
+  this.push(2)
+  this.push(3)
+  this.push(null)
+};
+source.flatMap(function (x) {
+  var source = new b.Readable({objectMode: true})
+  source._read = function () {
+    this.push(x * 1) // 1, 2, 3
+    this.push(x * 2) // 2, 4, 6
+    this.push(null)
+  }
+  return source
+}).buffer().done(function (data) {
+    assert.deepEqual(data, [1, 2, 2, 4, 3, 6])
+    done()
+  })
+  ```
+
 ### barrage.bufferTransform(transform, encoding) / new barrage.BufferTransform(transform, encoding)
 
 Takes a function that transforms a string and returns a `Transform` stream.  e.g.

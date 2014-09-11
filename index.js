@@ -181,6 +181,9 @@ function _transform(chunk, encoding, callback) {
       return result
     })
     .then(function (result) {
+      if (typeof result.pipe === 'function') {
+        return barrage(result).on('data', self.push.bind(self)).wait();
+      }
       return forof(result, self.push.bind(self))
     }, function (err) {
       self.emit('error', err)

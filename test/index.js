@@ -392,4 +392,33 @@ describe('barrage extensions', function () {
         })
     })
   })
+  describe('BarrageStream#flatMap(val->stream)', function () {
+    it('transforms as a stream', function (done) {
+      var source = new b.Readable({objectMode: true})
+      source._read = function () {
+        this.push(1)
+        this.push(2)
+        this.push(3)
+        this.push(null)
+      }
+      var data = []
+      source.flatMap(function (x) {
+          var source = new b.Readable({objectMode: true})
+          source._read = function () {
+            this.push(x * 1)
+            this.push(x * 2)
+            this.push(null)
+          }
+          return source
+        })
+        .on('error', done)
+        .on('data', function (chunk) {
+          data.push(chunk)
+        })
+        .on('end', function () {
+          assert.deepEqual(data, [1, 2, 2, 4, 3, 6])
+          done()
+        })
+    })
+  })
 })
