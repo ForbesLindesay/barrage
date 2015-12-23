@@ -3,8 +3,8 @@
 Extensions to streams (as a mixin)
 
 [![Build Status](https://img.shields.io/travis/ForbesLindesay/barrage/master.svg)](https://travis-ci.org/ForbesLindesay/barrage)
-[![Dependency Status](https://img.shields.io/gemnasium/ForbesLindesay/barrage.svg)](https://gemnasium.com/ForbesLindesay/barrage)
-[![NPM version](https://img.shields.io/npm/v/barrage.svg)](http://badge.fury.io/js/barrage)
+[![Dependency Status](https://img.shields.io/david/ForbesLindesay/barrage.svg)](https://david-dm.org/ForbesLindesay/barrage)
+[![NPM version](https://img.shields.io/npm/v/barrage.svg)](https://www.npmjs.com/package/barrage)
 
 ## Installation
 
