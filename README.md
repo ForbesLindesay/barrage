@@ -1,5 +1,7 @@
 # barrage
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/ForbesLindesay/barrage.svg)](https://greenkeeper.io/)
+
 Extensions to streams (as a mixin)
 
 [![Build Status](https://img.shields.io/travis/ForbesLindesay/barrage/master.svg)](https://travis-ci.org/ForbesLindesay/barrage)
