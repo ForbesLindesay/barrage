@@ -1,9 +1,9 @@
 'use strict'
 
+import assert = require('assert');
+import * as s from 'stream';
 import * as b from './';
-var assert = require('assert')
-var s = require('stream')
-var Promise = require('promise')
+import barrage from './';
 
 function delay(n: number): Promise<void> {
   return new Promise((resolve: any) => {
@@ -11,16 +11,16 @@ function delay(n: number): Promise<void> {
   });
 }
 
-// describe('barrage(stream) mixin', function () {
-//   it('returns `stream` with a mixin', function () {
-//     var r = new s.Readable()
-//     var w = new s.Writable()
-//     var t = new s.Transform()
-//     assert(b(r) === r)
-//     assert(b(w) === w)
-//     assert(b(t) === t)
-//   })
-// })
+describe('barrage(stream) mixin', function () {
+  it('returns `stream` with a mixin', function () {
+    var r = new s.Readable()
+    var w = new s.Writable()
+    var t = new s.Transform()
+    assert(b.Readable.fromStream(r) === (r as any));
+    assert(b.Writable.fromStream(w) === (w as any));
+    assert(b.Duplex.fromStream(t) === (t as any));
+  })
+})
 
 function streamType(name: string, type: string) {
   describe('barrage.' + name, function () {

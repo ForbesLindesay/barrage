@@ -13,6 +13,8 @@ export interface WritableStream<T> {
   emit(name: 'error', err: Error): void;
   write(chunk: T, cb?: Function): boolean;
   write(chunk: T, encoding?: string, cb?: Function): boolean;
+  untyped(): NodeJS.WritableStream;
+  wait(): Promise<void>;
 }
 
 export class Writable<T = Buffer> extends streams.Writable implements WritableStream<T> {
@@ -35,6 +37,15 @@ export class Writable<T = Buffer> extends streams.Writable implements WritableSt
       this.on('close', resolve);
     });
   }
+
+  static fromStream<T>(stream: NodeJS.WritableStream): WritableStream<T> {
+    const s = (stream as any);
+
+    s.wait = Duplex.prototype.wait;
+    s.untyped = Duplex.prototype.untyped;
+
+    return s;
+  }
 }
 
 export interface ReadableStream<T> {
@@ -54,6 +65,8 @@ export interface ReadableStream<T> {
   bufferTransform<TOutput>(transform: (input: T[]) => TOutput | PromiseLike<TOutput>): ReadableStream<TOutput>;
   bufferTransform<TOutput>(transform: (input: Buffer) => TOutput | PromiseLike<TOutput>, encoding: 'buffer'): ReadableStream<TOutput>;
   bufferTransform<TOutput>(transform: (input: string) => TOutput | PromiseLike<TOutput>, encoding: 'utf8'): ReadableStream<TOutput>;
+
+  untyped(): NodeJS.ReadableStream;
 }
 
 function isReadableStream(stream: any): stream is ReadableStream<any> {
@@ -150,6 +163,24 @@ export class Readable<T = Buffer> extends streams.Readable implements ReadableSt
   bufferTransform<TOutput>(transform: (input: any) => TOutput | PromiseLike<TOutput>, encoding?: 'buffer' | 'utf8'): ReadableStream<TOutput> {
     return this.syphon(new BufferTransform<T, TOutput>(transform, (encoding as any)));
   }
+
+  untyped(): NodeJS.ReadableStream {
+    return (this as any);
+  }
+
+  static fromStream<T>(stream: NodeJS.ReadableStream): ReadableStream<T> {
+    const s = (stream as any);
+
+    s.syphon = Readable.prototype.syphon;
+    s.buffer = Readable.prototype.buffer;
+    s.flatMap = Readable.prototype.flatMap;
+    s.map = Readable.prototype.map;
+    s.filter = Readable.prototype.filter;
+    s.bufferTransform = Readable.prototype.bufferTransform;
+    s.untyped = Readable.prototype.untyped;
+
+    return s;
+  }
 }
 
 function toBuffer(value: any): Buffer {
@@ -159,7 +190,9 @@ function toBuffer(value: any): Buffer {
   return Buffer.from(value);
 }
 
-export interface DuplexStream<TWrite, TRead = TWrite> extends WritableStream<TWrite>, ReadableStream<TRead> {}
+export interface DuplexStream<TWrite, TRead = TWrite> extends WritableStream<TWrite>, ReadableStream<TRead> {
+  untyped(): NodeJS.ReadableStream & NodeJS.WritableStream;
+}
 export class PassThrough<T> extends streams.PassThrough implements DuplexStream<T> {
   // Writeable
   write(chunk: T, cb?: Function): boolean;
@@ -167,11 +200,11 @@ export class PassThrough<T> extends streams.PassThrough implements DuplexStream<
   write(...args: any[]): boolean {
     return (super.write as any)(...args);
   }
-  untyped(): NodeJS.WritableStream {
+  untyped(): NodeJS.WritableStream & NodeJS.ReadableStream {
     return (this as any);
   }
   wait() {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.on('error', reject);
       this.on('end', resolve);
       (this as any).on('finish', resolve);
@@ -275,11 +308,11 @@ export class Duplex<TWrite, TRead> extends streams.Duplex implements DuplexStrea
   write(...args: any[]): boolean {
     return (super.write as any)(...args);
   }
-  untyped(): NodeJS.WritableStream {
+  untyped(): NodeJS.WritableStream & NodeJS.ReadableStream {
     return (this as any);
   }
   wait() {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.on('error', reject);
       this.on('end', resolve);
       (this as any).on('finish', resolve);
@@ -356,6 +389,23 @@ export class Duplex<TWrite, TRead> extends streams.Duplex implements DuplexStrea
   bufferTransform<TOutput>(transform: (input: any) => TOutput | PromiseLike<TOutput>, encoding?: 'buffer' | 'utf8'): ReadableStream<TOutput> {
     return this.syphon(new BufferTransform<TRead, TOutput>(transform, (encoding as any)));
   }
+
+  static fromStream<TWrite = Buffer, TRead = TWrite>(stream: NodeJS.ReadableStream & NodeJS.WritableStream): DuplexStream<TWrite, TRead> {
+    const s = (stream as any);
+
+    s.wait = Duplex.prototype.wait;
+
+    s.syphon = Duplex.prototype.syphon;
+    s.buffer = Duplex.prototype.buffer;
+    s.flatMap = Duplex.prototype.flatMap;
+    s.map = Duplex.prototype.map;
+    s.filter = Duplex.prototype.filter;
+    s.bufferTransform = Duplex.prototype.bufferTransform;
+
+    s.untyped = Duplex.prototype.untyped;
+
+    return s;
+  }
 }
 
 export interface WritableOptions<T> {
@@ -411,11 +461,11 @@ export class Transform<TWrite, TRead> extends streams.Transform implements Duple
   write(...args: any[]): boolean {
     return (super.write as any)(...args);
   }
-  untyped(): NodeJS.WritableStream {
+  untyped(): NodeJS.WritableStream & NodeJS.ReadableStream {
     return (this as any);
   }
   wait() {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.on('error', reject);
       this.on('end', resolve);
       (this as any).on('finish', resolve);
