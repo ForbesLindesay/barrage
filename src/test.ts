@@ -3,7 +3,6 @@
 import assert = require('assert');
 import * as s from 'stream';
 import * as b from './';
-import barrage from './';
 
 function delay(n: number): Promise<void> {
   return new Promise((resolve: any) => {
@@ -25,7 +24,7 @@ describe('barrage(stream) mixin', function () {
 function streamType(name: string, type: string) {
   describe('barrage.' + name, function () {
     it('is inherits from stream.' + name, function () {
-      assert((b as any)[name].prototype.__proto__.constructor === s[name])
+      assert((b as any)[name].prototype.__proto__.constructor === (s as any)[name])
     });
   })
 }

@@ -15,6 +15,8 @@ export interface WritableStream<T> {
     emit(name: 'error', err: Error): void;
     write(chunk: T, cb?: Function): boolean;
     write(chunk: T, encoding?: string, cb?: Function): boolean;
+    untyped(): NodeJS.WritableStream;
+    wait(): Promise<void>;
 }
 export declare class Writable<T = Buffer> extends streams.Writable implements WritableStream<T> {
     constructor(options: WritableOptions<T>);
@@ -22,6 +24,7 @@ export declare class Writable<T = Buffer> extends streams.Writable implements Wr
     write(chunk: T, encoding?: string, cb?: Function): boolean;
     untyped(): NodeJS.WritableStream;
     wait(): Promise<void>;
+    static fromStream<T>(stream: NodeJS.WritableStream): WritableStream<T>;
 }
 export interface ReadableStream<T> {
     on(event: "close", listener: () => void): this;
@@ -41,6 +44,7 @@ export interface ReadableStream<T> {
     bufferTransform<TOutput>(transform: (input: T[]) => TOutput | PromiseLike<TOutput>): ReadableStream<TOutput>;
     bufferTransform<TOutput>(transform: (input: Buffer) => TOutput | PromiseLike<TOutput>, encoding: 'buffer'): ReadableStream<TOutput>;
     bufferTransform<TOutput>(transform: (input: string) => TOutput | PromiseLike<TOutput>, encoding: 'utf8'): ReadableStream<TOutput>;
+    untyped(): NodeJS.ReadableStream;
 }
 export interface ReadableOptions<T> {
     highWaterMark?: number;
@@ -82,14 +86,17 @@ export declare class Readable<T = Buffer> extends streams.Readable implements Re
     bufferTransform<TOutput>(transform: (input: T[]) => TOutput | PromiseLike<TOutput>): ReadableStream<TOutput>;
     bufferTransform<TOutput>(transform: (input: Buffer) => TOutput | PromiseLike<TOutput>, encoding: 'buffer'): ReadableStream<TOutput>;
     bufferTransform<TOutput>(transform: (input: string) => TOutput | PromiseLike<TOutput>, encoding: 'utf8'): ReadableStream<TOutput>;
+    untyped(): NodeJS.ReadableStream;
+    static fromStream<T>(stream: NodeJS.ReadableStream): ReadableStream<T>;
 }
 export interface DuplexStream<TWrite, TRead = TWrite> extends WritableStream<TWrite>, ReadableStream<TRead> {
+    untyped(): NodeJS.ReadableStream & NodeJS.WritableStream;
 }
 export declare class PassThrough<T> extends streams.PassThrough implements DuplexStream<T> {
     write(chunk: T, cb?: Function): boolean;
     write(chunk: T, encoding?: string, cb?: Function): boolean;
-    untyped(): NodeJS.WritableStream;
-    wait(): Promise<{}>;
+    untyped(): NodeJS.WritableStream & NodeJS.ReadableStream;
+    wait(): Promise<void>;
     on(event: "close", listener: () => void): this;
     on(event: "data", listener: (chunk: Buffer | string) => void): this;
     on(event: "data", listener: (chunk: T) => void): this;
@@ -131,8 +138,8 @@ export declare class Duplex<TWrite, TRead> extends streams.Duplex implements Dup
     constructor(options: DuplexOptions<TWrite, TRead>);
     write(chunk: TWrite, cb?: Function): boolean;
     write(chunk: TWrite, encoding?: string, cb?: Function): boolean;
-    untyped(): NodeJS.WritableStream;
-    wait(): Promise<{}>;
+    untyped(): NodeJS.WritableStream & NodeJS.ReadableStream;
+    wait(): Promise<void>;
     on(event: "close", listener: () => void): this;
     on(event: "data", listener: (chunk: Buffer | string) => void): this;
     on(event: "data", listener: (chunk: TRead) => void): this;
@@ -163,6 +170,7 @@ export declare class Duplex<TWrite, TRead> extends streams.Duplex implements Dup
     bufferTransform<TOutput>(transform: (input: TRead[]) => TOutput | PromiseLike<TOutput>): ReadableStream<TOutput>;
     bufferTransform<TOutput>(transform: (input: Buffer) => TOutput | PromiseLike<TOutput>, encoding: 'buffer'): ReadableStream<TOutput>;
     bufferTransform<TOutput>(transform: (input: string) => TOutput | PromiseLike<TOutput>, encoding: 'utf8'): ReadableStream<TOutput>;
+    static fromStream<TWrite = Buffer, TRead = TWrite>(stream: NodeJS.ReadableStream & NodeJS.WritableStream): DuplexStream<TWrite, TRead>;
 }
 export interface WritableOptions<T> {
     highWaterMark?: number;
@@ -196,8 +204,8 @@ export declare class Transform<TWrite, TRead> extends streams.Transform implemen
     constructor(options: TransformOptions<TWrite, TRead>);
     write(chunk: TWrite, cb?: Function): boolean;
     write(chunk: TWrite, encoding?: string, cb?: Function): boolean;
-    untyped(): NodeJS.WritableStream;
-    wait(): Promise<{}>;
+    untyped(): NodeJS.WritableStream & NodeJS.ReadableStream;
+    wait(): Promise<void>;
     on(event: "close", listener: () => void): this;
     on(event: "data", listener: (chunk: Buffer | string) => void): this;
     on(event: "data", listener: (chunk: TRead) => void): this;
