@@ -1,0 +1,15 @@
+
+{
+  "compilerOptions": {
+    "declaration": true,
+    "lib":[
+      "dom",
+      "es2017"
+    ],
+    "outDir": "lib",
+    "strict": true,
+    "target": "es2017",
+    "module": "commonjs",
+    "noUnusedLocals": true
+  }
+}
