@@ -1,9 +1,9 @@
 {
   "name": "barrage",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "files": ["lib/index.d.ts", "lib/index.js"],
+  "files": ["lib/"],
   "description": "Extensions to streams (as a mixin)",
   "keywords": [],
   "dependencies": {
