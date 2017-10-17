@@ -3,10 +3,7 @@
   "version": "2.0.2",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "files": [
-    "lib/index.d.ts",
-    "lib/index.js"
-  ],
+  "files": ["lib/index.d.ts", "lib/index.js"],
   "description": "Extensions to streams (as a mixin)",
   "keywords": [],
   "dependencies": {
@@ -23,6 +20,7 @@
     "typescript": "^2.4.2"
   },
   "scripts": {
+    "prepublish": "npm run build",
     "build": "tsc",
     "pretest": "npm run build",
     "test": "mocha -R spec lib/test.js"
