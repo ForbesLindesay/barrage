@@ -27,11 +27,11 @@ export declare class Writable<T = Buffer> extends streams.Writable implements Wr
     static fromStream<T>(stream: NodeJS.WritableStream): WritableStream<T>;
 }
 export interface ReadableStream<T> {
-    on(event: "close", listener: () => void): this;
-    on(event: "data", listener: (chunk: T) => void): this;
-    on(event: "end", listener: () => void): this;
-    on(event: "readable", listener: () => void): this;
-    on(event: "error", listener: (err: Error) => void): this;
+    on(event: 'close', listener: () => void): this;
+    on(event: 'data', listener: (chunk: T) => void): this;
+    on(event: 'end', listener: () => void): this;
+    on(event: 'readable', listener: () => void): this;
+    on(event: 'error', listener: (err: Error) => void): this;
     syphon<TStream extends WritableStream<T>>(destination: TStream, options?: {
         end?: boolean;
     }): TStream;
@@ -56,12 +56,12 @@ export interface ReadableOptions<T> {
 export declare class Readable<T = Buffer> extends streams.Readable implements ReadableStream<T> {
     private _push;
     constructor(options?: ReadableOptions<T>);
-    on(event: "close", listener: () => void): this;
-    on(event: "data", listener: (chunk: Buffer | string) => void): this;
-    on(event: "data", listener: (chunk: T) => void): this;
-    on(event: "end", listener: () => void): this;
-    on(event: "readable", listener: () => void): this;
-    on(event: "error", listener: (err: Error) => void): this;
+    on(event: 'close', listener: () => void): this;
+    on(event: 'data', listener: (chunk: Buffer | string) => void): this;
+    on(event: 'data', listener: (chunk: T) => void): this;
+    on(event: 'end', listener: () => void): this;
+    on(event: 'readable', listener: () => void): this;
+    on(event: 'error', listener: (err: Error) => void): this;
     pipe<TStream extends NodeJS.WritableStream>(destination: TStream, options?: {
         end?: boolean;
     }): TStream;
@@ -97,12 +97,12 @@ export declare class PassThrough<T> extends streams.PassThrough implements Duple
     write(chunk: T, encoding?: string, cb?: Function): boolean;
     untyped(): NodeJS.WritableStream & NodeJS.ReadableStream;
     wait(): Promise<void>;
-    on(event: "close", listener: () => void): this;
-    on(event: "data", listener: (chunk: Buffer | string) => void): this;
-    on(event: "data", listener: (chunk: T) => void): this;
-    on(event: "end", listener: () => void): this;
-    on(event: "readable", listener: () => void): this;
-    on(event: "error", listener: (err: Error) => void): this;
+    on(event: 'close', listener: () => void): this;
+    on(event: 'data', listener: (chunk: Buffer | string) => void): this;
+    on(event: 'data', listener: (chunk: T) => void): this;
+    on(event: 'end', listener: () => void): this;
+    on(event: 'readable', listener: () => void): this;
+    on(event: 'error', listener: (err: Error) => void): this;
     pipe<TStream extends NodeJS.WritableStream>(destination: TStream, options?: {
         end?: boolean;
     }): TStream;
@@ -140,12 +140,12 @@ export declare class Duplex<TWrite, TRead> extends streams.Duplex implements Dup
     write(chunk: TWrite, encoding?: string, cb?: Function): boolean;
     untyped(): NodeJS.WritableStream & NodeJS.ReadableStream;
     wait(): Promise<void>;
-    on(event: "close", listener: () => void): this;
-    on(event: "data", listener: (chunk: Buffer | string) => void): this;
-    on(event: "data", listener: (chunk: TRead) => void): this;
-    on(event: "end", listener: () => void): this;
-    on(event: "readable", listener: () => void): this;
-    on(event: "error", listener: (err: Error) => void): this;
+    on(event: 'close', listener: () => void): this;
+    on(event: 'data', listener: (chunk: Buffer | string) => void): this;
+    on(event: 'data', listener: (chunk: TRead) => void): this;
+    on(event: 'end', listener: () => void): this;
+    on(event: 'readable', listener: () => void): this;
+    on(event: 'error', listener: (err: Error) => void): this;
     pipe<TStream extends NodeJS.WritableStream>(destination: TStream, options?: {
         end?: boolean;
     }): TStream;
@@ -206,12 +206,12 @@ export declare class Transform<TWrite, TRead> extends streams.Transform implemen
     write(chunk: TWrite, encoding?: string, cb?: Function): boolean;
     untyped(): NodeJS.WritableStream & NodeJS.ReadableStream;
     wait(): Promise<void>;
-    on(event: "close", listener: () => void): this;
-    on(event: "data", listener: (chunk: Buffer | string) => void): this;
-    on(event: "data", listener: (chunk: TRead) => void): this;
-    on(event: "end", listener: () => void): this;
-    on(event: "readable", listener: () => void): this;
-    on(event: "error", listener: (err: Error) => void): this;
+    on(event: 'close', listener: () => void): this;
+    on(event: 'data', listener: (chunk: Buffer | string) => void): this;
+    on(event: 'data', listener: (chunk: TRead) => void): this;
+    on(event: 'end', listener: () => void): this;
+    on(event: 'readable', listener: () => void): this;
+    on(event: 'error', listener: (err: Error) => void): this;
     pipe<TStream extends NodeJS.WritableStream>(destination: TStream, options?: {
         end?: boolean;
     }): TStream;
