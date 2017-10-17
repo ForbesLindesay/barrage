@@ -5,9 +5,13 @@ export interface WritableOptions<T> {
   highWaterMark?: number;
   decodeStrings?: boolean;
   objectMode?: boolean;
-  write: (chunk: T, encoding: string, callback: Function) => any;
-  writev?: (chunks: {chunk: T; encoding: string}[], callback: Function) => any;
+  write: (chunk: T, encoding: string, callback: (error?: Error) => void) => any;
+  writev?: (
+    chunks: {chunk: T; encoding: string}[],
+    callback: (error?: Error) => void,
+  ) => any;
   destroy?: (error?: Error) => any;
+  final?: (callback: (error?: Error) => void) => any;
 }
 export interface WritableStream<T> {
   emit(name: 'error', err: Error): void;
@@ -572,15 +576,6 @@ export class Duplex<TWrite, TRead> extends streams.Duplex
 
     return s;
   }
-}
-
-export interface WritableOptions<T> {
-  highWaterMark?: number;
-  decodeStrings?: boolean;
-  objectMode?: boolean;
-  write: (chunk: T, encoding: string, callback: Function) => any;
-  writev?: (chunks: {chunk: T; encoding: string}[], callback: Function) => any;
-  destroy?: (error?: Error) => any;
 }
 
 export interface TransformOptionsBase {
